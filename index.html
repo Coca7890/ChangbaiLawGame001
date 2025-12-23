@@ -1,0 +1,1438 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>剧本杀 - 校园谜案</title>
+    <style>
+        /* 全局样式 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Microsoft YaHei', sans-serif;
+            background-color: #f5f5f5;
+            color: #333;
+            overflow-x: hidden;
+            line-height: 1.6;
+        }
+        
+        /* 容器样式 */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        /* 标题样式 */
+        h1, h2, h3 {
+            color: #222;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        h1 {
+            font-size: 2.5em;
+            margin-top: 40px;
+            text-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        h2 {
+            font-size: 2em;
+            margin-top: 30px;
+        }
+        
+        h3 {
+            font-size: 1.5em;
+            margin-top: 20px;
+        }
+        
+        /* 文本样式 */
+        p {
+            margin-bottom: 15px;
+            text-align: justify;
+            line-height: 1.8;
+        }
+        
+        /* 按钮样式 - 增强醒目度 */
+        .btn {
+            display: inline-block;
+            padding: 12px 24px;
+            margin: 10px;
+            background-color: #e74c3c;
+            color: #ffffff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        
+        .btn:hover {
+            background-color: #c0392b;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+        }
+        
+        /* NPC介绍方框样式 */
+        .npc-box {
+            background-color: #fff;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 10px 0;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            border-left: 4px solid #e74c3c;
+        }
+        
+        .npc-box h4 {
+            color: #222;
+            margin-bottom: 8px;
+            font-size: 1.2em;
+        }
+        
+        .npc-box p {
+            color: #555;
+            margin: 0;
+        }
+        
+        .btn-container {
+            text-align: center;
+            margin: 30px 0;
+        }
+        
+        /* 卡片样式 */
+        .card-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px;
+            margin: 30px 0;
+        }
+        
+        .card {
+            width: 200px;
+            height: 300px;
+            background-color: #fff;
+            border-radius: 10px;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        .card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            background-color: #f9f9f9;
+        }
+        
+        .card h3 {
+            margin-bottom: 10px;
+        }
+        
+        .card-back {
+            background: linear-gradient(135deg, #eee, #ddd);
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 24px;
+            font-weight: bold;
+            color: #555;
+            backface-visibility: hidden;
+            transition: transform 0.6s;
+        }
+        
+        .card.flipped .card-back {
+            transform: rotateY(180deg);
+        }
+        
+        .card-content {
+            backface-visibility: hidden;
+            transform: rotateY(180deg);
+            transition: transform 0.6s;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .card.flipped .card-content {
+            transform: rotateY(0deg);
+        }
+        
+        /* 模态框样式 */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            overflow-y: auto;
+        }
+        
+        .modal-content {
+            background-color: #fff;
+            margin: 5% auto;
+            padding: 30px;
+            border-radius: 10px;
+            width: 80%;
+            max-width: 800px;
+            position: relative;
+            animation: modalFadeIn 0.5s;
+        }
+        
+        @keyframes modalFadeIn {
+            from {opacity: 0; transform: translateY(-50px);}
+            to {opacity: 1; transform: translateY(0);}
+        }
+        
+        .close {
+            color: #999;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            position: absolute;
+            top: 15px;
+            right: 20px;
+        }
+        
+        .close:hover {
+            color: #333;
+        }
+        
+        /* 聊天框样式 */
+        .chat-container {
+            background-color: #fff;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 30px 0;
+            height: 400px;
+            overflow-y: auto;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .chat-message {
+            margin-bottom: 15px;
+            padding: 10px;
+            border-radius: 5px;
+            background-color: #f1f1f1;
+        }
+        
+        .chat-message.user {
+            background-color: #e74c3c;
+            color: white;
+            margin-left: 20%;
+        }
+        
+        .chat-message.npc {
+            background-color: #f1f1f1;
+            margin-right: 20%;
+        }
+        
+        .message-sender {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .chat-input {
+            display: flex;
+            margin-top: 20px;
+        }
+        
+        .chat-input input {
+            flex: 1;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px 0 0 5px;
+            background-color: #fff;
+            color: #333;
+            font-size: 16px;
+        }
+        
+        .chat-input button {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 0 5px 5px 0;
+            background-color: #e74c3c;
+            color: white;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+        
+        .chat-input button:hover {
+            background-color: #c0392b;
+        }
+        
+        /* 背景图片样式 */
+        .background-image {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0.15;
+            z-index: -1;
+            object-fit: cover;
+        }
+        
+        /* 进度条样式 */
+        .progress-container {
+            width: 100%;
+            background-color: #eee;
+            border-radius: 10px;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+        
+        .progress-bar {
+            height: 10px;
+            background-color: #e74c3c;
+            border-radius: 10px;
+            width: 0%;
+            transition: width 1s linear;
+        }
+        
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .card {
+                width: 150px;
+                height: 250px;
+            }
+            
+            .modal-content {
+                width: 95%;
+                padding: 20px;
+            }
+            
+            h1 {
+                font-size: 2em;
+            }
+            
+            h2 {
+                font-size: 1.5em;
+            }
+            
+            h3 {
+                font-size: 1.2em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 背景图片 -->
+    <img src="https://p3-flow-imagex-sign.byteimg.com/tos-cn-i-a9rns2rl98/rc/pc/super_tool/2b882f7a25b547a6a5fa21db1c52e85f~tplv-a9rns2rl98-image.image?rcl=20251223104316D178F8B70DFDD0047612&rk3s=8e244e95&rrcfp=f06b921b&x-expires=1769050078&x-signature=8JzYivBG5dkDXb15QtCQUFKBHDw%3D" alt="背景" class="background-image" id="backgroundImage">
+    
+    <!-- 主容器 -->
+    <div class="container" id="mainContainer">
+        <!-- 游戏标题 -->
+        <h1>剧本杀 - 校园谜案</h1>
+        
+        <!-- 游戏介绍 -->
+        <div id="gameIntro">
+            <p>欢迎来到剧本杀游戏！在这个游戏中，你将扮演一个角色，通过收集线索、与其他角色交流，找出隐藏的凶手。</p>
+            <p>游戏背景：七个男孩当年因为面子霸凌一个瘦弱男生，意外把男生打死。自那年起每一年他们七人中都会有一人死去，距离2006年过去三年，七人里死了三个人还剩四人。2009年12月4日即将到来，恐惧笼罩着幸存者们...</p>
+            
+            <div class="btn-container">
+                <button class="btn" id="startGameBtn">开始游戏</button>
+            </div>
+        </div>
+        
+        <!-- 身份选择 -->
+        <div id="identitySelection" style="display: none;">
+            <h2>选择你的身份</h2>
+            <p>请从以下身份中选择一个：</p>
+            
+            <div class="card-container">
+                <div class="card" data-identity="王弈">
+                    <h3>王弈</h3>
+                    <p>家境优渥的纨绔子弟</p>
+                </div>
+                <div class="card" data-identity="林卓凡">
+                    <h3>林卓凡</h3>
+                    <p>转学生，背景神秘</p>
+                </div>
+                <div class="card" data-identity="赵英南">
+                    <h3>赵英南</h3>
+                    <p>王弈的跟班，有心计</p>
+                </div>
+                <div class="card" data-identity="徐时北">
+                    <h3>徐时北</h3>
+                    <p>热爱艺术的富家子</p>
+                </div>
+                <div class="card" data-identity="韩叶">
+                    <h3>韩叶</h3>
+                    <p>成绩优异的竞争者</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 人物介绍 -->
+        <div id="characterIntro" style="display: none;">
+            <h2>人物介绍</h2>
+            <div id="characterInfo"></div>
+            
+            <div class="btn-container">
+                <button class="btn" id="nextToBackgroundBtn">下一步：剧情背景</button>
+            </div>
+        </div>
+        
+        <!-- 剧情背景 -->
+        <div id="storyBackground" style="display: none;">
+            <h2>剧情背景</h2>
+            <p>七个男孩当年因为面子霸凌一个瘦弱男生，意外把男生打死，因他们做的隐蔽以及家中有权有势，且又是在小县城，七人的事情没有被爆出，但自那年起每一年他们七人中都会有一人死去，距离2006年过去三年，七人里死了三个人还剩四人。</p>
+            <p>然更让人惊恐的是三人死法各异，根本没有办法将三人联系到一起。因三人父辈在县城也是有名有姓，警察十分重视这则案件，可惜过去多年一无所获，唯一能把三人联系到一起的是死亡时间，每年的十二月四日。</p>
+            <p>2005年 七个孩子上初一</p>
+            <p>2009年 幸存者读高二</p>
+            
+            <div class="btn-container">
+                <button class="btn" id="nextToTimelineBtn">下一步：时间线</button>
+            </div>
+        </div>
+        
+        <!-- 时间线 -->
+        <div id="timeline" style="display: none;">
+            <h2>时间线</h2>
+            <div id="timelineContent"></div>
+        </div>
+        
+        <!-- 故事开端 -->
+        <div id="storyBeginning" style="display: none;">
+            <h2>故事开端</h2>
+            <p><strong>开端背景:</strong> 2009年12月4日就要到来，四人心虚担惊受怕今年死的会是自己。旁人不知晓12月4日是什么意思，他们知道，四年前的这天有人因他们而死。自那以后，每年12月4日，他们之中都会死一个人。</p>
+            <p><strong>开始时间：</strong>2009年12月1日</p>
+            <p><strong>发生地：</strong>学校</p>
+            <p><strong>剧情：</strong>体育课上，王弈几人罕见没有打球而是聚在一起，忽的有人发现韩叶不在，几人背后发凉寻找消失的韩叶，几人最终在班里发现韩叶，韩叶被人下了迷药，几人想办法唤醒韩叶后询问韩叶发生了什么事。</p>
+            
+            <div class="btn-container">
+                <button class="btn" id="startFirstActBtn">开始第一幕</button>
+            </div>
+        </div>
+        
+        <!-- 第一幕 -->
+        <div id="firstAct" style="display: none;">
+            <h2>第一幕</h2>
+            <div id="classroomBackground" style="background-color: #fff; padding: 20px; border-radius: 10px; margin-bottom: 30px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                <h3>教室场景</h3>
+                <p>你和其他四人在教室里，韩叶刚刚苏醒，看起来有些迷茫。</p>
+                
+                <!-- 需求1：删除未选择的四位NPC介绍，清空该区域 -->
+                <div id="npcIntroductions" style="margin: 20px 0; display: flex; flex-direction: column; gap: 15px;"></div>
+                
+                <div id="hanYeStory" style="margin: 20px 0; padding: 15px; background-color: #f9f9f9; border-radius: 5px;">
+                    <h4>韩叶的讲述</h4>
+                    <p>"我...我记得我在完成作业，然后突然感到一阵眩晕，就什么都不知道了。昏迷前，我好像看到了一个女孩的身影，但不确定是不是真的..."</p>
+                </div>
+            </div>
+            
+            <div id="playerClues1" style="display: none; margin: 20px 0; padding: 15px; background-color: #fff; border-radius: 5px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                <h4>已收集的线索</h4>
+                <div id="playerCluesContent1"></div>
+            </div>
+            
+            <h3>线索抽取</h3>
+            <p>请从以下12张线索卡中随机选择2张：</p>
+            
+            <div class="card-container" id="clueCards1">
+                <!-- 线索卡片将通过JS动态生成 -->
+            </div>
+            
+            <div class="btn-container" id="clueActions1" style="display: none;">
+                <button class="btn" id="viewOtherClues1Btn">查看他人线索</button>
+                <button class="btn" id="skipToDiscussion1Btn">不查看他人线索，直接进入讨论</button>
+            </div>
+            
+            <div id="discussion1" style="display: none;">
+                <h3>讨论环节</h3>
+                <p>请与其他角色讨论谁是凶手。讨论时间限制为10分钟。</p>
+                
+                <div class="progress-container">
+                    <div class="progress-bar" id="discussionTimer1"></div>
+                </div>
+                
+                <div class="chat-container" id="chatContainer1"></div>
+                
+                <div class="chat-input">
+                    <input type="text" id="messageInput1" placeholder="输入你的发言...">
+                    <button id="sendMessage1Btn">发送</button>
+                </div>
+                
+                <div class="btn-container">
+                    <button class="btn" id="voteNow1Btn">现在投票</button>
+                </div>
+            </div>
+            
+            <div id="voting1" style="display: none;">
+                <h3>投票环节</h3>
+                <p>请选择你认为的凶手：</p>
+                
+                <div class="card-container" id="voteCards1">
+                    <!-- 投票卡片将通过JS动态生成 -->
+                </div>
+            </div>
+        </div>
+        
+        <!-- 第二幕 -->
+        <div id="secondAct" style="display: none;">
+            <h2>第二幕</h2>
+            <!-- 需求3：新增第二幕背景介绍 -->
+            <div id="secondActBackground" style="background-color: #fff; padding: 20px; border-radius: 10px; margin-bottom: 30px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                <p>时间：2009年12月1日下午放学。你们接到于家电话，于清月消失，因为有韩盛的例子在，你们以为是凶手要对于清月下手，你们赶去于家寻找踪迹。于清月消失的时间是下午五点到下午七点之间。你们在于清月房中寻找线索。</p>
+            </div>
+            
+            <h3>线索抽取</h3>
+            <p>请从以下6张线索卡中随机选择1张：</p>
+            
+            <div class="card-container" id="clueCards2">
+                <!-- 线索卡片将通过JS动态生成 -->
+            </div>
+            
+            <div class="btn-container" id="clueActions2" style="display: none;">
+                <button class="btn" id="viewOtherClues2Btn">查看他人线索</button>
+                <button class="btn" id="skipToDiscussion2Btn">不查看他人线索，直接进入讨论</button>
+            </div>
+            
+            <div id="discussion2" style="display: none;">
+                <h3>讨论环节</h3>
+                <p>请与其他角色讨论于清月失踪的真相及凶手身份。讨论时间限制为10分钟。</p>
+                
+                <div class="progress-container">
+                    <div class="progress-bar" id="discussionTimer2"></div>
+                </div>
+                
+                <div class="chat-container" id="chatContainer2"></div>
+                
+                <div class="chat-input">
+                    <input type="text" id="messageInput2" placeholder="输入你的发言...">
+                    <button id="sendMessage2Btn">发送</button>
+                </div>
+                
+                <div class="btn-container">
+                    <button class="btn" id="voteNow2Btn">现在投票</button>
+                </div>
+            </div>
+            
+            <div id="voting2" style="display: none;">
+                <h3>投票环节</h3>
+                <p>请选择你认为的凶手：</p>
+                
+                <div class="card-container" id="voteCards2">
+                    <!-- 投票卡片将通过JS动态生成 -->
+                </div>
+            </div>
+        </div>
+        
+        <!-- 游戏复盘 -->
+        <div id="gameReview" style="display: none;">
+            <h2>游戏复盘</h2>
+            <div id="reviewContent"></div>
+            
+            <div class="btn-container">
+                <button class="btn" id="continueBtn">继续</button>
+            </div>
+            
+            <!-- 闪黑效果 -->
+            <div id="blackFlash" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: black; z-index: 1000;"></div>
+            
+            <!-- 三个文字框 -->
+            <div id="messageBoxes" style="display: none;">
+                <div id="messageBox1" class="message-box" style="display: none; background-color: #fff; padding: 20px; border-radius: 10px; margin-bottom: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);"></div>
+                <div id="messageBox2" class="message-box" style="display: none; background-color: #fff; padding: 20px; border-radius: 10px; margin-bottom: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);"></div>
+                <div id="messageBox3" class="message-box" style="display: none; background-color: #fff; padding: 20px; border-radius: 10px; margin-bottom: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);"></div>
+                
+                <!-- 重新游戏按钮 -->
+                <div class="btn-container" id="restartGameContainer" style="display: none;">
+                    <button class="btn" id="restartGameBtn">重新游戏</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 结果模态框 -->
+        <div id="resultModal" class="modal">
+            <div class="modal-content">
+                <span class="close">&times;</span>
+                <h2 id="resultTitle"></h2>
+                <p id="resultMessage"></p>
+                
+                <div class="btn-container">
+                    <button class="btn" id="nextActBtn">下一幕</button>
+                    <button class="btn" id="viewReviewBtn">查看复盘</button>
+                    <button class="btn" id="restartGameBtnModal">重新开始</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // 游戏数据
+        const gameData = {
+            playerIdentity: null,
+            selectedClues1: [],
+            selectedClues2: [],
+            npcIdentities: ['王弈', '林卓凡', '赵英南', '徐时北', '韩叶'],
+            clues1: [
+                { id: 1, content: '在韩叶的课桌里发现了一张纸条，上面写着："12月4日，血债血偿。"' },
+                { id: 2, content: '监控显示，案发时间前后，有一个穿校服的女生在教室附近徘徊。' },
+                { id: 3, content: '王弈最近行为反常，经常独自发呆，似乎在担心什么。' },
+                { id: 4, content: '林卓凡转学时间恰好是三年前的12月5日，也就是去年案发后的第二天。' },
+                { id: 5, content: '赵英南的书包里发现了一把小刀，上面有可疑的红色物质。' },
+                { id: 6, content: '徐时北最近在画一幅画，画中是一个男生被多人殴打。' },
+                { id: 7, content: '韩叶的手机里有一条未读短信："我知道你们当年做了什么。"' },
+                { id: 8, content: '学校储物室里发现了一件带血的校服，经确认是三年前失踪的学生的。' },
+                { id: 9, content: '有学生反映，最近经常看到一个穿白衣服的女生在学校附近游荡。' },
+                { id: 10, content: '赵英南最近和校外的一些不良青年有联系。' },
+                { id: 11, content: '徐时北的日记里写着："我每晚都会梦到他，他在向我索命。"' },
+                { id: 12, content: '王弈的父亲最近突然给他转了一大笔钱，并叮嘱他最近要小心。' }
+            ],
+            clues2: [
+                { id: 13, content: '警方在案发现场附近找到了一枚女生的发夹。' },
+                { id: 14, content: '赵英南的手机通话记录显示，案发前他曾多次联系一个叫"许悠"的人。' },
+                { id: 15, content: '林卓凡的真实身份是当年被霸凌学生的表弟。' },
+                { id: 16, content: '徐时北最近开始收集关于校园霸凌的法律资料。' },
+                { id: 17, content: '韩叶的体检报告显示，他最近一直在服用抗抑郁药物。' },
+                { id: 18, content: '王弈收到了一封匿名信，信中详细描述了三年前霸凌事件的经过。' }
+            ],
+            npcMessages: {
+                '王弈': [
+                    '我觉得这件事肯定和当年的事情有关，每年12月4日都有人死，太巧合了。',
+                    '韩叶，你真的什么都不记得了吗？那个女孩长什么样？',
+                    '我最近总感觉有人在跟踪我，晚上睡觉都睡不安稳。',
+                    '你们说，会不会是他的家人来报仇了？',
+                    '我爸爸最近也很紧张，给了我一笔钱让我出去躲躲。'
+                ],
+                '林卓凡': [
+                    '我是转学生，对你们当年的事情不太了解，但我觉得这件事不简单。',
+                    '韩叶被下迷药，说明有人想对他不利，我们应该报警。',
+                    '我最近也听到一些奇怪的传闻，说学校里有女鬼出没。',
+                    '你们有没有想过，可能是你们中间的某个人干的？',
+                    '我觉得我们应该团结起来，一起找出真相。'
+                ],
+                '赵英南': [
+                    '怕什么？我们当年做得很干净，不会有人发现的。',
+                    '韩叶，你该不会是在装吧？想引我们上钩？',
+                    '我看那个女鬼的传闻就是有人故意传出来吓唬我们的。',
+                    '谁敢动我们，我就叫我那些兄弟收拾他。',
+                    '要不我们主动出击，找出那个幕后黑手？'
+                ],
+                '徐时北': [
+                    '我觉得我们应该去自首，这样下去迟早会疯的。',
+                    '我每晚都会做噩梦，梦到他浑身是血地向我走来。',
+                    '韩叶，你说的那个女孩，会不会是...当年的那个女生？',
+                    '我最近在研究法律，校园霸凌是要负刑事责任的。',
+                    '也许我们应该找个心理医生看看，我们都有创伤后应激障碍。'
+                ],
+                '韩叶': [
+                    '我真的什么都不记得了，就记得有个女孩的身影。',
+                    '我手机里的那条短信，会不会是凶手发的？',
+                    '你们说，当年的事情会不会是有人故意设计的？',
+                    '我最近也感觉有人在跟踪我，好可怕。',
+                    '要不我们去报警吧，把当年的事情都说出来，也许能得到宽大处理。'
+                ]
+            },
+            npcResponses: {
+                '王弈': [
+                    '你说得对，我们确实应该团结起来。',
+                    '但是报警的话，我们当年的事情不就曝光了吗？',
+                    '我觉得我们应该先找出凶手，再决定要不要报警。',
+                    '你有什么线索吗？',
+                    '我总觉得赵英南最近有点奇怪，你注意到了吗？'
+                ],
+                '林卓凡': [
+                    '你分析得很有道理，我们确实需要更多线索。',
+                    '作为转学生，我觉得你们之间的关系很复杂。',
+                    '你觉得谁的嫌疑最大？',
+                    '我们应该把所有线索都整理一下，看看有没有共同点。',
+                    '我总觉得韩叶知道的比他说的要多。'
+                ],
+                '赵英南': [
+                    '你少在这里装好人，谁知道你安的什么心。',
+                    '我看你才是最可疑的，一直在那里分析这个分析那个。',
+                    '有本事你就找出真凶来，光说不练假把式。',
+                    '我警告你，别多管闲事，否则后果自负。',
+                    '你该不会是想转移注意力吧？'
+                ],
+                '徐时北': [
+                    '我觉得你的想法很理性，我们确实需要冷静分析。',
+                    '也许我们应该去当年的案发现场看看，说不定能找到什么线索。',
+                    '你觉得那个女鬼的传闻是真的吗？',
+                    '我最近一直在做心理治疗，医生说我有严重的 guilt complex。',
+                    '你说，我们还有机会赎罪吗？'
+                ],
+                '韩叶': [
+                    '谢谢你相信我，我真的什么都不记得了。',
+                    '你觉得那个给我发短信的人会不会就是凶手？',
+                    '我最近一直在做噩梦，梦到一个男生在向我求救。',
+                    '你说，我们还有机会重新开始吗？',
+                    '我觉得我们应该去祭拜一下他，也许他的灵魂就能安息了。'
+                ]
+            }
+        };
+
+        // 页面加载完成后初始化所有事件
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('页面加载完成，初始化游戏...');
+            
+            // ========== 核心功能函数 ==========
+            // 开始游戏
+            function startGame() {
+                console.log('开始游戏按钮点击');
+                document.getElementById('gameIntro').style.display = 'none';
+                document.getElementById('identitySelection').style.display = 'block';
+                
+                // 为身份卡片添加点击事件
+                const identityCards = document.querySelectorAll('#identitySelection .card');
+                identityCards.forEach(card => {
+                    card.addEventListener('click', () => {
+                        const identity = card.dataset.identity;
+                        gameData.playerIdentity = identity;
+                        console.log('选择身份：', identity);
+                        showCharacterIntro(identity);
+                    });
+                });
+            }
+            
+            // 显示人物介绍（需求2：补充每个NPC介绍到200字左右）
+            function showCharacterIntro(identity) {
+                document.getElementById('identitySelection').style.display = 'none';
+                document.getElementById('characterIntro').style.display = 'block';
+                
+                let info = '';
+                gameData.npcIdentities.forEach(npc => {
+                    if (npc !== identity) {
+                        switch(npc) {
+                            case '王弈':
+                                info += `
+                                    <div class="npc-box">
+                                        <h4>王弈</h4>
+                                        <p>我是王弈，家里在县城做建材生意，算是有头有脸的人家。从小到大我想要的东西从来没有得不到的，周言那个穷酸小子却三番五次不给我面子，扣我的分、告我的状，真当我不敢把他怎么样？当年的事虽然是意外，但我从不后悔，只是每年12月4日的死亡阴影确实让我心慌。最近总感觉有人跟着我，晚上睡觉总做噩梦，梦到周言浑身是血地站在我床边。我知道那几个兄弟心里也怕，但这事谁也不能说出去，否则我们这辈子都完了。</p>
+                                    </div>
+                                `;
+                                break;
+                            case '林卓凡':
+                                info += `
+                                    <div class="npc-box">
+                                        <h4>林卓凡</h4>
+                                        <p>我是林卓凡，三年前转到这个学校。没人知道我的真实身份，我是周言的表弟，当年他出事后，我发誓要让所有欺负他的人付出代价。我花了三年时间调查，终于摸清了这几个人的底细，每年12月4日的"意外死亡"都是我的手笔。我转学过来就是为了近距离接近他们，收集他们的罪证。表面上我装作冷漠的转学生，暗地里却一直在策划复仇。韩叶被下迷药是我做的，我就是要让他们活在恐惧中，体会当年周言所承受的绝望。</p>
+                                    </div>
+                                `;
+                                break;
+                            case '赵英南':
+                                info += `
+                                    <div class="npc-box">
+                                        <h4>赵英南</h4>
+                                        <p>我是赵英南，王弈的跟班。我家条件不如其他几人，父母都是给王弈家打工的，所以我只能跟着王弈混。当年打周言的时候我最卖力，就是想在王弈面前表现自己。张天沐是我杀的，他一直仗着和王弈关系好就欺负我，还抢我的女朋友于清月，我早就忍够了。杀了他之后我本来很害怕，但林卓凡抓住了我的把柄，逼我帮他杀了于嘉和陈翰飞。现在我每天都活在恐惧中，怕被警察发现，也怕林卓凡灭口，只能走一步看一步。</p>
+                                    </div>
+                                `;
+                                break;
+                            case '徐时北':
+                                info += `
+                                    <div class="npc-box">
+                                        <h4>徐时北</h4>
+                                        <p>我是徐时北，家里做艺术收藏生意，从小我就喜欢画画。当年参与霸凌周言是我这辈子最后悔的事，我其实一直看不惯王弈他们的所作所为，但又不敢反抗。这些年我每晚都做噩梦，梦到周言向我求救的样子。我开始收集校园霸凌的法律资料，想过自首，但又怕毁了自己的人生。我知道林卓凡的复仇计划，也有意无意地给他透露过一些信息，算是我的赎罪吧。我现在只想尽快结束这一切，哪怕付出代价也无所谓。</p>
+                                    </div>
+                                `;
+                                break;
+                            case '韩叶':
+                                info += `
+                                    <div class="npc-box">
+                                        <h4>韩叶</h4>
+                                        <p>我是韩叶，成绩一直名列前茅。当年我参与霸凌周言，一部分是怕被王弈他们孤立，另一部分也是嫉妒周言的成绩总是压我一头。这些年我活在深深的愧疚中，靠抗抑郁药物才能入睡。我知道自己手上沾着周言的血，每年12月4日都怕得要死，生怕下一个死的就是我。我偷偷去看过周言的父母，他们还不知道真相，我真想把一切都说出来，但我没有勇气。这次被下迷药让我更加恐惧，我感觉有人在盯着我，也许这就是我的报应。</p>
+                                    </div>
+                                `;
+                                break;
+                        }
+                    }
+                });
+                document.getElementById('characterInfo').innerHTML = info;
+            }
+            
+            // 显示剧情背景
+            function showStoryBackground() {
+                document.getElementById('characterIntro').style.display = 'none';
+                document.getElementById('storyBackground').style.display = 'block';
+            }
+            
+            // 显示时间线（动画逐条出现，0.1s间隔）
+            function showTimeline() {
+                document.getElementById('storyBackground').style.display = 'none';
+                document.getElementById('timeline').style.display = 'block';
+                
+                const timelineContent = document.getElementById('timelineContent');
+                timelineContent.innerHTML = '';
+                
+                const timelineEvents = [
+                    { date: '2005年9月', content: '七人小升初，因七人家里都在一起工作，虽分到不同班级，但七人关系要好，在他们所在的初中是一个有名的小团体，众人不敢得罪他们。' },
+                    { date: '2005年9月16日', content: '王奕因在网吧通宵被父母教训，本就心情不好，到了学校因忘记穿校服被检查纪律的同学扣分，王奕生气，声称如果他们敢扣他的分，他一定教训他们。几位同学听说过王奕的名字，不愿意招惹这个刺头，但周言是个一板一眼的人，且他一心扑在学习上并不认识王奕，周言扣分，王奕因此事记恨周言。' },
+                    { date: '2005年9月23日', content: '王奕在学校碰到一位女生，女生长相白净清纯，王奕对其一见钟情。许悠和周言是青梅竹马，许悠长相出众，为了避免男生骚扰，许悠经常拿周言做幌子，这次依然，王奕对周言的恨意又加深了几分。' },
+                    { date: '2005年10月5日', content: '初一月考成绩出来，王奕因成绩倒数被家长骂，家长指着第一名的成绩怒骂王奕，而第一名好巧不巧是周言。王奕赶到学校时迟到，王奕再一次遇到周言，周言不顾王奕威胁又一次扣了王奕的分数。' },
+                    { date: '2005年10月5日下午', content: '王奕决心给周言一个教训。王奕找伙伴们，听到周言的名字几人具是不喜，每每家里面骂他们都会再夸上周言几句。且旁人都不敢扣他们分数，独独周言根本不惧他们威胁，看到他们违规即扣分数。放学后，几人在周言必经之路等候，等周言到了，几人共同殴打周言。' },
+                    { date: '2005年10月6日', content: '昨天揍完周言几人神清气爽，但第二天到校，周言已经上报老师，老师找到他们，要给他们家长打电话。几人家长到学校，得知孩子逃课还打人，家长无颜以对，连连给老师道歉，回到家几人挨了一顿揍，因此事几人对周言恨意更惧。' },
+                    { date: '2005年10月6日下午', content: '王奕等人商量想要给周言一个狠狠的教训。' },
+                    { date: '2005年10月9日', content: '王奕几人把周言带到男厕，几人脱光周言衣服并对周言进行拍照，威胁周言如果敢把这件事说出去，他们就把照片复印贴在学校大门口。因此番威胁周言没有状告老师。' },
+                    { date: '2005年10月16日', content: '王奕几人网吧逃课，被周言看到，几人都认定因为拍照的事情周言绝对不会敢扣他们分，结果周言又扣了，且老师电话打到了家里，时隔十几天几人再被家人揍。' },
+                    { date: '2005年10月17日', content: '王奕等人找上周言，几人在厕所狠狠教训周言，再次脱掉周言衣服并骑着周言，让其在厕所爬，几人警告周言如果再扣他们分，扣一次他们玩一次。' },
+                    { date: '2005年10月17日下午', content: '周言赤裸照片在学校传开。' },
+                    { date: '2005年10月18日', content: '周言第一次没有来学校，校领导看重周言成绩认为其未来无可限量，严查照片一事，查到王弈等人身上，因王弈几人家境，校领导没敢把事情公之于众，只隐晦提醒王弈等人的父母。王弈几人被家里断了零花钱。' },
+                    { date: '2005年10月19日—2005年11月16日', content: '几人消停了一段时间。' },
+                    { date: '2005年11月19日', content: '学校二十六周年校庆，每个班都有人上台表演。许悠上台表演芭蕾舞，一舞毕，全场欢呼，王弈的视线再一次被许悠吸引。这次王弈在打听后清楚许悠和周言只是青梅竹马没有别的关系。许悠深受其骚扰。' },
+                    { date: '2005年11月20日', content: '王弈落单，周言找准时机狠狠揍了王弈。' },
+                    { date: '2005年11月21日', content: '周五放学，周言被王弈几人围殴。' },
+                    { date: '2005年11月25日', content: '王弈看出许悠对周言很是关心，用周言威胁许悠，如果许悠不同意跟自己恋爱，他便让人打死周言。两人的谈话被周言听到，周言带许悠离开。' },
+                    { date: '2005年11月25日—2005年12月3日', content: '周言遭受王弈几人连续多日殴打。注：王弈感到自己颜面被人挑衅，周言一而再再而三不给他面子，加之许悠的原因。另外六人只是将围殴当做寻常事，且几人也看不惯周言。' },
+                    { date: '2005年12月4日', content: '意外发生，这日王弈等人把周言堵在巷子里，周言被打多日已经有了些许经验，在他们还未动手前，周言向外跑，一辆货车驶来，周言丧命。' },
+                    { date: '2005年12月5日', content: '周言死的消息在校内传遍。' },
+                    { date: '2005年12月8日', content: '周言死前和王弈等人在一起的消息泄露，王弈几人不敢再隐瞒家里，几人被父母惩罚，父母帮他们瞒下此事。' },
+                    { date: '2006年新学期伊始', content: '王弈等人所在的班级来了一名转校生。' },
+                    { date: '2006年12月4日', content: '张天沐死。' },
+                    { date: '2007年12月4日', content: '于嘉死。' },
+                    { date: '2008年12月4日', content: '陈翰飞死。' },
+                    { date: '2009年12月1日', content: '韩叶在教室被人下迷药，这一天，距离12月4日还有三天...' }
+                ];
+                
+                // 逐条显示（0.1s间隔）
+                let index = 0;
+                const showNextEvent = () => {
+                    if (index < timelineEvents.length) {
+                        const event = timelineEvents[index];
+                        const eventElement = document.createElement('div');
+                        eventElement.className = 'npc-box timeline-event';
+                        eventElement.style.opacity = '0';
+                        eventElement.style.transform = 'translateY(20px)';
+                        eventElement.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+                        
+                        eventElement.innerHTML = `
+                            <h4>${event.date}</h4>
+                            <p>${event.content}</p>
+                        `;
+                        
+                        timelineContent.appendChild(eventElement);
+                        
+                        setTimeout(() => {
+                            eventElement.style.opacity = '1';
+                            eventElement.style.transform = 'translateY(0)';
+                        }, 10);
+                        
+                        index++;
+                        setTimeout(showNextEvent, 100); // 0.1s显示下一条
+                    } else {
+                        // 所有时间线显示完后添加下一步按钮
+                        const nextButton = document.createElement('div');
+                        nextButton.className = 'btn-container';
+                        nextButton.innerHTML = '<button class="btn" id="nextToBeginningBtn">下一步：故事开端</button>';
+                        timelineContent.appendChild(nextButton);
+                        
+                        document.getElementById('nextToBeginningBtn').addEventListener('click', showStoryBeginning);
+                    }
+                };
+                showNextEvent();
+            }
+            
+            // 显示故事开端
+            function showStoryBeginning() {
+                document.getElementById('timeline').style.display = 'none';
+                document.getElementById('storyBeginning').style.display = 'block';
+            }
+            
+            // 开始第一幕（核心修复：确保事件绑定成功）
+            function startFirstAct() {
+                console.log('点击开始第一幕');
+                document.getElementById('storyBeginning').style.display = 'none';
+                document.getElementById('firstAct').style.display = 'block';
+                
+                // 更换背景图 - 套用首图设计方式
+                document.getElementById('backgroundImage').src = 'https://p3-flow-imagex-sign.byteimg.com/tos-cn-i-a9rns2rl98/rc/pc/super_tool/2b882f7a25b547a6a5fa21db1c52e85f~tplv-a9rns2rl98-image.image?rcl=20251223104316D178F8B70DFDD0047612&rk3s=8e244e95&rrcfp=f06b921b&x-expires=1769050078&x-signature=8JzYivBG5dkDXb15QtCQUFKBHDw%3D';
+                
+                // 需求1：清空NPC介绍区域（删除未选择的四位NPC介绍）
+                const npcIntroductions = document.getElementById('npcIntroductions');
+                npcIntroductions.innerHTML = '';
+                
+                // 生成线索卡片
+                generateClueCards(document.getElementById('clueCards1'), gameData.clues1, 2, 'selectedClues1');
+            }
+            
+            // 生成线索卡片
+            function generateClueCards(container, clues, maxSelect, selectedCluesKey) {
+                container.innerHTML = '';
+                
+                clues.forEach((clue) => {
+                    const card = document.createElement('div');
+                    card.className = 'card';
+                    card.dataset.clueId = clue.id;
+                    
+                    card.innerHTML = `
+                        <div class="card-back">线索 ${clue.id}</div>
+                        <div class="card-content">
+                            <h3>线索 ${clue.id}</h3>
+                            <p>${clue.content}</p>
+                        </div>
+                    `;
+                    
+                    card.addEventListener('click', () => {
+                        if (!card.classList.contains('selected') && gameData[selectedCluesKey].length < maxSelect) {
+                            card.classList.add('selected', 'flipped');
+                            gameData[selectedCluesKey].push(clue);
+                            
+                            if (gameData[selectedCluesKey].length === maxSelect) {
+                                container.nextElementSibling.style.display = 'block';
+                            }
+                        }
+                    });
+                    
+                    container.appendChild(card);
+                });
+            }
+            
+            // 第一幕：查看他人线索（原卡片翻转8张）
+            function viewOtherClues1() {
+                document.getElementById('clueActions1').style.display = 'none';
+                
+                // 筛选未选择的线索
+                const unselectedClues = gameData.clues1.filter(clue => 
+                    !gameData.selectedClues1.some(selected => selected.id === clue.id)
+                );
+                
+                // 随机选8张
+                const randomClues = [...unselectedClues].sort(() => Math.random() - 0.5).slice(0, 8);
+                
+                // 原卡片翻转
+                randomClues.forEach(clue => {
+                    const card = document.querySelector(`#clueCards1 .card[data-clue-id="${clue.id}"]`);
+                    if (card && !card.classList.contains('flipped')) {
+                        card.classList.add('flipped');
+                        gameData.selectedClues1.push(clue);
+                    }
+                });
+                
+                // 添加继续按钮
+                const continueBtn = document.createElement('div');
+                continueBtn.className = 'btn-container';
+                continueBtn.innerHTML = '<button class="btn" id="continueToDiscussion1Btn">继续</button>';
+                continueBtn.id = 'continueBtnContainer1';
+                document.getElementById('clueCards1').parentNode.insertBefore(continueBtn, document.getElementById('clueCards1').nextSibling);
+                
+                document.getElementById('continueToDiscussion1Btn').addEventListener('click', () => {
+                    continueBtn.remove();
+                    startDiscussion1();
+                });
+            }
+            
+            // 第一幕：跳过查看线索，直接讨论
+            function skipToDiscussion1() {
+                document.getElementById('clueActions1').style.display = 'none';
+                startDiscussion1();
+            }
+            
+            // 第一幕：开始讨论
+            function startDiscussion1() {
+                document.getElementById('discussion1').style.display = 'block';
+                
+                // 启动计时器（测试用缩短为1分钟）
+                startTimer('discussionTimer1', 60, () => {
+                    showVoting1();
+                });
+                
+                // 系统消息
+                addChatMessage('系统', '讨论开始，请大家积极发言，找出凶手。', 'chatContainer1');
+                
+                // 模拟NPC发言
+                simulateNpcMessages('chatContainer1');
+            }
+            
+            // 发送讨论消息
+            function sendMessage1() {
+                const input = document.getElementById('messageInput1');
+                const message = input.value.trim();
+                if (message) {
+                    addChatMessage(gameData.playerIdentity, message, 'chatContainer1');
+                    input.value = '';
+                    
+                    // 模拟NPC回应
+                    setTimeout(() => {
+                        simulateNpcResponse('chatContainer1');
+                    }, 1000);
+                }
+            }
+            
+            // 第一幕：显示投票（隐藏教室场景，显示所有线索）
+            function showVoting1() {
+                document.getElementById('discussion1').style.display = 'none';
+                document.getElementById('classroomBackground').style.display = 'none';
+                document.getElementById('playerClues1').style.display = 'block';
+                
+                // 显示所有已收集线索
+                let cluesHtml = '';
+                gameData.selectedClues1.forEach(clue => {
+                    cluesHtml += `<p><strong>线索${clue.id}：</strong>${clue.content}</p>`;
+                });
+                document.getElementById('playerCluesContent1').innerHTML = cluesHtml;
+                
+                document.getElementById('voting1').style.display = 'block';
+                generateVoteCards(document.getElementById('voteCards1'), 'vote1');
+            }
+            
+            // ========== 第二幕新增/修复功能 ==========
+            // 第二幕：查看他人线索（需求4：修复按钮无反应）
+            function viewOtherClues2() {
+                document.getElementById('clueActions2').style.display = 'none';
+                
+                // 筛选未选择的线索
+                const unselectedClues = gameData.clues2.filter(clue => 
+                    !gameData.selectedClues2.some(selected => selected.id === clue.id)
+                );
+                
+                // 随机选4张未抽取的线索
+                const randomClues = [...unselectedClues].sort(() => Math.random() - 0.5).slice(0, 4);
+                
+                // 原卡片翻转
+                randomClues.forEach(clue => {
+                    const card = document.querySelector(`#clueCards2 .card[data-clue-id="${clue.id}"]`);
+                    if (card && !card.classList.contains('flipped')) {
+                        card.classList.add('flipped');
+                        gameData.selectedClues2.push(clue);
+                    }
+                });
+                
+                // 添加继续按钮
+                const continueBtn = document.createElement('div');
+                continueBtn.className = 'btn-container';
+                continueBtn.innerHTML = '<button class="btn" id="continueToDiscussion2Btn">继续</button>';
+                continueBtn.id = 'continueBtnContainer2';
+                document.getElementById('clueCards2').parentNode.insertBefore(continueBtn, document.getElementById('clueCards2').nextSibling);
+                
+                document.getElementById('continueToDiscussion2Btn').addEventListener('click', () => {
+                    continueBtn.remove();
+                    startDiscussion2();
+                });
+            }
+            
+            // 第二幕：跳过查看线索，直接讨论（需求4：修复按钮无反应）
+            function skipToDiscussion2() {
+                document.getElementById('clueActions2').style.display = 'none';
+                startDiscussion2();
+            }
+            
+            // 第二幕：开始讨论
+            function startDiscussion2() {
+                document.getElementById('discussion2').style.display = 'block';
+                
+                // 启动计时器（测试用缩短为1分钟）
+                startTimer('discussionTimer2', 60, () => {
+                    showVoting2();
+                });
+                
+                // 系统消息
+                addChatMessage('系统', '讨论开始，请大家分析于清月失踪的真相及凶手身份。', 'chatContainer2');
+                
+                // 模拟NPC发言
+                simulateNpcMessages('chatContainer2');
+            }
+            
+            // 第二幕：发送讨论消息
+            function sendMessage2() {
+                const input = document.getElementById('messageInput2');
+                const message = input.value.trim();
+                if (message) {
+                    addChatMessage(gameData.playerIdentity, message, 'chatContainer2');
+                    input.value = '';
+                    
+                    // 模拟NPC回应
+                    setTimeout(() => {
+                        simulateNpcResponse('chatContainer2');
+                    }, 1000);
+                }
+            }
+            
+            // 第二幕：显示投票
+            function showVoting2() {
+                document.getElementById('discussion2').style.display = 'none';
+                document.getElementById('voting2').style.display = 'block';
+                generateVoteCards(document.getElementById('voteCards2'), 'vote2');
+            }
+            
+            // ========== 通用功能 ==========
+            // 生成投票卡片
+            function generateVoteCards(container, voteType) {
+                container.innerHTML = '';
+                const identities = ['王弈', '林卓凡', '赵英南', '徐时北', '韩叶'];
+                
+                identities.forEach(identity => {
+                    const card = document.createElement('div');
+                    card.className = 'card';
+                    card.innerHTML = `<h3>${identity}</h3>`;
+                    
+                    card.addEventListener('click', () => {
+                        if (identity === '赵英南') {
+                            showResult('游戏胜利', '你成功找出了凶手！', voteType);
+                        } else {
+                            showResult('投票错误', '你没有找出真正的凶手。', voteType);
+                        }
+                    });
+                    
+                    container.appendChild(card);
+                });
+            }
+            
+            // 显示结果弹窗
+            function showResult(title, message, voteType) {
+                document.getElementById('resultTitle').textContent = title;
+                document.getElementById('resultMessage').textContent = message;
+                document.getElementById('resultModal').style.display = 'block';
+                
+                // 第一幕选赵英南胜利，直接复盘；否则进入第二幕
+                if (voteType === 'vote1' && title === '游戏胜利') {
+                    document.getElementById('nextActBtn').style.display = 'none';
+                    document.getElementById('viewReviewBtn').style.display = 'inline-block';
+                } else if (voteType === 'vote1') {
+                    document.getElementById('nextActBtn').style.display = 'inline-block';
+                    document.getElementById('viewReviewBtn').style.display = 'none';
+                } else {
+                    document.getElementById('nextActBtn').style.display = 'none';
+                    document.getElementById('viewReviewBtn').style.display = 'inline-block';
+                }
+            }
+            
+            // 查看复盘（完整案件真相）
+            function viewReview() {
+                document.getElementById('resultModal').style.display = 'none';
+                document.getElementById('firstAct').style.display = 'none';
+                document.getElementById('secondAct').style.display = 'none';
+                document.getElementById('gameReview').style.display = 'block';
+                
+                // 确保复盘内容显示，文字框隐藏
+                const reviewContent = document.getElementById('reviewContent');
+                if (reviewContent) {
+                    reviewContent.style.display = 'block';
+                }
+                
+                const messageBoxes = document.getElementById('messageBoxes');
+                if (messageBoxes) {
+                    messageBoxes.style.display = 'none';
+                }
+                
+                const gameReviewBtnContainer = document.querySelector('#gameReview .btn-container');
+                if (gameReviewBtnContainer) {
+                    gameReviewBtnContainer.style.display = 'block';
+                }
+                
+                // 确保所有消息框隐藏
+                const messageBox1 = document.getElementById('messageBox1');
+                const messageBox2 = document.getElementById('messageBox2');
+                const messageBox3 = document.getElementById('messageBox3');
+                if (messageBox1) { messageBox1.style.display = 'none'; }
+                if (messageBox2) { messageBox2.style.display = 'none'; }
+                if (messageBox3) { messageBox3.style.display = 'none'; }
+                
+                // 确保重新游戏按钮容器隐藏
+                const restartGameContainer = document.getElementById('restartGameContainer');
+                if (restartGameContainer) {
+                    restartGameContainer.style.display = 'none';
+                }
+                
+                const reviewHtml = `
+                    <div class="npc-box">
+                        <h4>真凶揭秘</h4>
+                        <p>真凶是赵英南！</p>
+                    </div>
+                    <div class="npc-box">
+                        <h4>案件真相</h4>
+                        <p>张天沐的死是赵英南，张天沐是几人中和王奕关系最好的，张天沐知晓赵英南父母是王奕父亲下属，是以对赵英南常常诸多指使。</p>
+                        <p>两人看似是兄弟实则张天沐将赵英南当做跑腿小弟，在赵英南和于清月在一起后张天沐对赵英南不满更盛，张天沐也喜欢于清月，当时他和赵英南一起追于清月，于清月选择了赵英南。</p>
+                        <p>因此事张天沐对赵英南态度更为恶劣。</p>
+                        <p>张天沐死的当晚是因赵英南本就因齐夏感到难受，张天沐又肆意侮辱，赵英南喝了些酒后心中愈发气愤，醉醺醺寻到网吧，意外杀死张天沐，张天沐死后他瞬间清醒开始伪造现场。</p>
+                        <p>然张天沐的所作所为都被一人看在眼中——林卓凡。</p>
+                        <p>于嘉死的背后，有于清月在推动，于清月那晚和赵英南打电话只是因愧疚，于清月对于于嘉感情很复杂，她怨恨于嘉抢走了父母的爱，然于嘉待她又极好。</p>
+                        <p>陈翰飞会是第三个死的是因当时他意图对许悠不轨。</p>
+                        <p>徐北时未曾出手但他知晓这些事，且有意无意向林卓凡透露几人的情报，帮助林卓凡完成杀人。</p>
+                        <p>韩叶杀死韩盛一事他们几人知晓，此次林卓凡等人的目标并非韩叶而是王弈。</p>
+                        <p>然于清月临时反水，于清月和徐北时两人纵容甚至帮助林卓凡做这些事，两人心中备受煎熬，两人已经打算投案自首。</p>
+                        <p>是以两人这次破坏了林卓凡计划，让得你们暴露。</p>
+                        <p>杀死张天沐的凶手是赵英南，林卓凡看到其行凶录下影像。</p>
+                        <p>林卓凡心中渐渐有了计划，于嘉的死与他有着莫大干系，然他选择在12月4日，既是因周言又是因赵英南，很巧张天沐也死于12月4日。</p>
+                        <p>陈翰飞之死是林卓凡胁迫赵英南所为。</p>
+                    </div>
+                    <div class="npc-box">
+                        <h4>结局</h4>
+                        <p>赵英南最终被警方逮捕，他对自己的罪行供认不讳。其他参与者也都受到了相应的法律制裁。这个案件也引起了社会对校园霸凌问题的广泛关注。</p>
+                    </div>
+                `;
+                
+                document.getElementById('reviewContent').innerHTML = reviewHtml;
+            }
+            
+            // 重新开始游戏（清空所有进度）
+            function restartGame() {
+                // 重置游戏数据
+                gameData.playerIdentity = null;
+                gameData.selectedClues1 = [];
+                gameData.selectedClues2 = [];
+                
+                // 隐藏所有界面，回到初始
+                document.getElementById('resultModal').style.display = 'none';
+                document.getElementById('gameReview').style.display = 'none';
+                document.getElementById('firstAct').style.display = 'none';
+                document.getElementById('secondAct').style.display = 'none';
+                document.getElementById('identitySelection').style.display = 'none';
+                document.getElementById('characterIntro').style.display = 'none';
+                document.getElementById('storyBackground').style.display = 'none';
+                document.getElementById('timeline').style.display = 'none';
+                document.getElementById('storyBeginning').style.display = 'none';
+                document.getElementById('gameIntro').style.display = 'block';
+                
+                // 清空动态内容
+                document.getElementById('chatContainer1').innerHTML = '';
+                document.getElementById('chatContainer2').innerHTML = '';
+                document.getElementById('clueCards1').innerHTML = '';
+                document.getElementById('clueCards2').innerHTML = '';
+                document.getElementById('voteCards1').innerHTML = '';
+                document.getElementById('voteCards2').innerHTML = '';
+                document.getElementById('timelineContent').innerHTML = '';
+                document.getElementById('npcIntroductions').innerHTML = '';
+                
+                // 重置游戏复盘部分的状态
+                const reviewContent = document.getElementById('reviewContent');
+                if (reviewContent) {
+                    reviewContent.style.display = 'block';
+                    reviewContent.innerHTML = '';
+                }
+                
+                const gameReviewBtnContainer = document.querySelector('#gameReview .btn-container');
+                if (gameReviewBtnContainer) {
+                    gameReviewBtnContainer.style.display = 'block';
+                }
+                
+                const messageBoxes = document.getElementById('messageBoxes');
+                if (messageBoxes) {
+                    messageBoxes.style.display = 'none';
+                }
+                
+                const messageBox1 = document.getElementById('messageBox1');
+                const messageBox2 = document.getElementById('messageBox2');
+                const messageBox3 = document.getElementById('messageBox3');
+                
+                if (messageBox1) {
+                    messageBox1.style.display = 'none';
+                    messageBox1.innerHTML = '';
+                }
+                
+                if (messageBox2) {
+                    messageBox2.style.display = 'none';
+                    messageBox2.innerHTML = '';
+                }
+                
+                if (messageBox3) {
+                    messageBox3.style.display = 'none';
+                    messageBox3.innerHTML = '';
+                }
+                
+                const restartGameContainer = document.getElementById('restartGameContainer');
+                if (restartGameContainer) {
+                    restartGameContainer.style.display = 'none';
+                }
+                
+                // 重置样式
+                document.getElementById('playerClues1').style.display = 'none';
+                document.getElementById('playerCluesContent1').innerHTML = '';
+                document.getElementById('clueActions1').style.display = 'none';
+                document.getElementById('clueActions2').style.display = 'none';
+                document.getElementById('discussion1').style.display = 'none';
+                document.getElementById('discussion2').style.display = 'none';
+                document.getElementById('voting1').style.display = 'none';
+                document.getElementById('voting2').style.display = 'none';
+                
+                // 恢复背景图
+                document.getElementById('backgroundImage').src = 'https://p3-flow-imagex-sign.byteimg.com/tos-cn-i-a9rns2rl98/rc/pc/super_tool/2b882f7a25b547a6a5fa21db1c52e85f~tplv-a9rns2rl98-image.image?rcl=20251223104316D178F8B70DFDD0047612&rk3s=8e244e95&rrcfp=f06b921b&x-expires=1769050078&x-signature=8JzYivBG5dkDXb15QtCQUFKBHDw%3D';
+                
+                // 清空输入框
+                document.getElementById('messageInput1').value = '';
+                document.getElementById('messageInput2').value = '';
+            }
+            
+            // ========== 辅助函数 ==========
+            // 计时器
+            function startTimer(timerId, seconds, callback) {
+                const timer = document.getElementById(timerId);
+                timer.style.width = '100%';
+                let timeLeft = seconds;
+                
+                const interval = setInterval(() => {
+                    timeLeft--;
+                    const percentage = (timeLeft / seconds) * 100;
+                    timer.style.width = `${percentage}%`;
+                    
+                    if (timeLeft <= 0) {
+                        clearInterval(interval);
+                        callback();
+                    }
+                }, 1000);
+            }
+            
+            // 添加聊天消息
+            function addChatMessage(sender, content, containerId) {
+                const container = document.getElementById(containerId);
+                const messageDiv = document.createElement('div');
+                messageDiv.className = `chat-message ${sender === gameData.playerIdentity ? 'user' : 'npc'}`;
+                
+                messageDiv.innerHTML = `
+                    <div class="message-sender">${sender}</div>
+                    <div class="message-content">${content}</div>
+                `;
+                
+                container.appendChild(messageDiv);
+                container.scrollTop = container.scrollHeight;
+            }
+            
+            // 模拟NPC发言
+            function simulateNpcMessages(containerId) {
+                const npcs = gameData.npcIdentities.filter(npc => npc !== gameData.playerIdentity);
+                
+                npcs.forEach((npc, index) => {
+                    setTimeout(() => {
+                        const messages = gameData.npcMessages[npc];
+                        const randomMsg = messages[Math.floor(Math.random() * messages.length)];
+                        addChatMessage(npc, randomMsg, containerId);
+                    }, 2000 * (index + 1));
+                });
+            }
+            
+            // 模拟NPC回应
+            function simulateNpcResponse(containerId) {
+                const npcs = gameData.npcIdentities.filter(npc => npc !== gameData.playerIdentity);
+                const randomNpc = npcs[Math.floor(Math.random() * npcs.length)];
+                const responses = gameData.npcResponses[randomNpc];
+                const randomResp = responses[Math.floor(Math.random() * responses.length)];
+                
+                addChatMessage(randomNpc, randomResp, containerId);
+            }
+            
+            // ========== 绑定所有按钮事件 ==========
+            // 初始按钮
+            document.getElementById('startGameBtn').addEventListener('click', startGame);
+            document.getElementById('nextToBackgroundBtn').addEventListener('click', showStoryBackground);
+            document.getElementById('nextToTimelineBtn').addEventListener('click', showTimeline);
+            document.getElementById('startFirstActBtn').addEventListener('click', startFirstAct);
+            
+            // 第一幕按钮
+            document.getElementById('viewOtherClues1Btn').addEventListener('click', viewOtherClues1);
+            document.getElementById('skipToDiscussion1Btn').addEventListener('click', skipToDiscussion1);
+            document.getElementById('sendMessage1Btn').addEventListener('click', sendMessage1);
+            document.getElementById('voteNow1Btn').addEventListener('click', showVoting1);
+            
+            // 第二幕按钮（需求4：修复无反应问题，绑定事件）
+            document.getElementById('viewOtherClues2Btn').addEventListener('click', viewOtherClues2);
+            document.getElementById('skipToDiscussion2Btn').addEventListener('click', skipToDiscussion2);
+            document.getElementById('sendMessage2Btn').addEventListener('click', sendMessage2);
+            document.getElementById('voteNow2Btn').addEventListener('click', showVoting2);
+            
+            // 结果弹窗按钮
+            document.getElementById('nextActBtn').addEventListener('click', () => {
+                document.getElementById('resultModal').style.display = 'none';
+                // 第二幕逻辑
+                document.getElementById('firstAct').style.display = 'none';
+                document.getElementById('secondAct').style.display = 'block';
+                
+                // 设置第二幕背景图 - 套用首图设计方式
+                document.getElementById('backgroundImage').src = 'https://p3-flow-imagex-sign.byteimg.com/tos-cn-i-a9rns2rl98/rc/pc/super_tool/2b882f7a25b547a6a5fa21db1c52e85f~tplv-a9rns2rl98-image.image?rcl=20251223104316D178F8B70DFDD0047612&rk3s=8e244e95&rrcfp=f06b921b&x-expires=1769050078&x-signature=8JzYivBG5dkDXb15QtCQUFKBHDw%3D';
+                
+                generateClueCards(document.getElementById('clueCards2'), gameData.clues2, 1, 'selectedClues2');
+            });
+            document.getElementById('viewReviewBtn').addEventListener('click', viewReview);
+            document.getElementById('restartGameBtn').addEventListener('click', restartGame);
+            document.getElementById('restartGameBtnModal').addEventListener('click', restartGame);
+            
+            // "继续"按钮点击事件
+            document.getElementById('continueBtn').addEventListener('click', () => {
+                // 显示闪黑效果
+                const blackFlash = document.getElementById('blackFlash');
+                blackFlash.style.display = 'block';
+                
+                // 1秒后隐藏闪黑效果
+                setTimeout(() => {
+                    blackFlash.style.display = 'none';
+                    
+                    // 隐藏原来的复盘内容
+                    document.getElementById('reviewContent').style.display = 'none';
+                    document.querySelector('#gameReview .btn-container').style.display = 'none';
+                    
+                    // 显示文字框容器
+                    document.getElementById('messageBoxes').style.display = 'block';
+                    
+                    // 三个文字框内容
+                    const message1 = "拒绝校园霸凌。要明德、要守法、要择友、要勤学的殷切期盼，希望同学们从自身做起，增强文明守法意识，提高自我保护能力，既不要做校园霸凌的\"受害者\"，也不要做\"旁观者\"，更不能做\"霸凌者\"。不做附和者或冷眼旁观者，拒绝煽风点火，拒绝成为欺凌者的\"帮凶\"；拒绝当事不关己的旁观者，适当对被欺凌者表达同情和关心；在能力范围内施以援手，帮助被欺凌者。 《最高人民法院关于审理未成年人刑事案件具体应用法律若干问题的解释》第八条 已满十六周岁不满十八周岁的人出于以大欺小、以强凌弱或者寻求精神刺激，随意殴打其他未成年人、多次对其他未成年人强拿硬要或者任意损毁公私财物，扰乱学校及其他公共场所秩序，情节严重的，以寻衅滋事罪定罪处罚。";
+                    const message2 = "拒绝校园早恋。在此次剧本杀中早恋的危害体现的淋漓尽致。\"早恋\"的危害体现的淋漓尽致。会损害心身健康。青少年情绪不稳定、易冲动、自控能力比较差，早恋必然会花费很多的时间与精力，精神压力和负担就会比较大，损害身心健康，不利于青少年的发展。会影响个人的前途。早恋在一定程度上浪费时间，分散精力，影响学习，多数可能造成学习成绩下滑，影响个人的学业生涯，可能会发生违法犯罪的行为。在恋爱的时候需要金钱、精力投入，为了经费，有些人可能会走上违法犯罪的道路。";
+                    const message3 = "养成良好心态，促进自身健康发展。要了解自己的思维方式、行为方式及人格，从而将自己塑造成一个情绪稳定、意志坚强、人际关系和谐、社会适应性好、开朗乐观的人。要培养积极、稳定的情绪、积极参加集体活动，主动与人交往。同时养成\"凡事要思考，事后不后悔\"的习惯，处理事情要分清轻重缓急，事先周密思考，才不致产生事后后悔的心理矛盾。最后，要善于纠正自己非理性的观念，一个人只有正确地认识自己，他的行为举止才能得体，学习和工作才能适应，才能努力地发展自己，主动地进行自我教育。如果自我观念不正确，他可能自视甚高，自以为了不起，去做力不能及的工作，他也可能自觉羞惭，不肯以本来的面目表现自己，以致形成沉重的心理负担，不能心地坦然。";
+                    
+                    // 显示第一个文字框
+                    const messageBox1 = document.getElementById('messageBox1');
+                    messageBox1.innerHTML = message1;
+                    messageBox1.style.display = 'block';
+                    
+                    // 1秒后显示第二个文字框
+                    setTimeout(() => {
+                        const messageBox2 = document.getElementById('messageBox2');
+                        messageBox2.innerHTML = message2;
+                        messageBox2.style.display = 'block';
+                        
+                        // 1秒后显示第三个文字框
+                        setTimeout(() => {
+                            const messageBox3 = document.getElementById('messageBox3');
+                            messageBox3.innerHTML = message3;
+                            messageBox3.style.display = 'block';
+                            
+                            // 1秒后显示重新游戏按钮
+                            setTimeout(() => {
+                                document.getElementById('restartGameContainer').style.display = 'block';
+                            }, 1000);
+                        }, 1000);
+                    }, 1000);
+                }, 1000);
+            });
+            
+            // 关闭弹窗
+            document.querySelector('.close').addEventListener('click', () => {
+                document.getElementById('resultModal').style.display = 'none';
+            });
+            
+            // 回车发送消息
+            document.getElementById('messageInput1').addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') sendMessage1();
+            });
+            document.getElementById('messageInput2').addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') sendMessage2();
+            });
+            
+            // 点击弹窗外部关闭
+            window.addEventListener('click', (e) => {
+                if (e.target === document.getElementById('resultModal')) {
+                    document.getElementById('resultModal').style.display = 'none';
+                }
+            });
+            
+            console.log('游戏初始化完成，所有按钮事件绑定成功！');
+        });
+    </script>
+</body>
+</html>
