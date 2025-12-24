@@ -574,6 +574,9 @@
                 <div id="messageBox2" class="message-box" style="display: none; background-color: #fff; padding: 20px; border-radius: 10px; margin-bottom: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);"></div>
                 <div id="messageBox3" class="message-box" style="display: none; background-color: #fff; padding: 20px; border-radius: 10px; margin-bottom: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);"></div>
                 
+                <!-- 注意提示 -->
+                <div id="jurisdictionNotice" style="font-weight: bold; font-size: 1.2em; margin-bottom: 20px; text-align: center; color: #333; display: none;">长白新村街道司法所</div>
+                
                 <!-- 重新游戏按钮 -->
                 <div class="btn-container" id="restartGameContainer" style="display: none;">
                     <button class="btn" id="restartGameBtn">重新游戏</button>
@@ -1352,6 +1355,12 @@
                     restartGameContainer.style.display = 'none';
                 }
                 
+                // 隐藏司法提示
+                const jurisdictionNotice = document.getElementById('jurisdictionNotice');
+                if (jurisdictionNotice) {
+                    jurisdictionNotice.style.display = 'none';
+                }
+                
                 const reviewHtml = `
                     <div class="npc-box">
                         <h4>真凶揭秘</h4>
@@ -1606,10 +1615,15 @@
                             messageBox3.innerHTML = message3;
                             messageBox3.style.display = 'block';
                             
-                            // 1秒后显示重新游戏按钮
+                            // 显示长白新村街道司法所提示
                             setTimeout(() => {
-                                document.getElementById('restartGameContainer').style.display = 'block';
-                            }, 1000);
+                                document.getElementById('jurisdictionNotice').style.display = 'block';
+                                
+                                // 1秒后显示重新游戏按钮
+                                setTimeout(() => {
+                                    document.getElementById('restartGameContainer').style.display = 'block';
+                                }, 1000);
+                            }, 500);
                         }, 1000);
                     }, 1000);
                 }, 1000);
